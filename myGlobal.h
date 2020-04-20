@@ -47,6 +47,7 @@
 	int semID;
 	int * arr;
 	int CheckTime();
+	int RandomResourceNumber();
 	void RandomTime();
 
 

@@ -3,8 +3,13 @@ int sharedID, semID;
 unsigned int randomSecond, randomNanoSecond;
 int main()
 {
+	
+	//number of resources
+	//number used
+	//shareable - boolean
+
 	key_t key = ftok(sharedKey, sharedInt);
-	sharedID = shmget(key, 2 * sizeof(unsigned int), 0666|IPC_CREAT);
+	sharedID = shmget(key, 62 * sizeof(unsigned int), 0666|IPC_CREAT);
 	semID = semget(1963, 1, IPC_CREAT|0666);
 	semctl(semID, 0, SETVAL, 1);
 	randomSecond = 0;
@@ -15,6 +20,26 @@ int main()
 	arr = (int*) shmat(sharedID, NULL, 0);
 	arr[0] = 0;
 	arr[1] = 0;
+	int i = 0;
+	for(i = 2; i < 20; i = i + 3)
+	{
+		arr[i] = randomResourceNumber();
+		arr[i+1] = 0;
+		arr[i+2] = 0;
+
+	
+	}
+	
+
+	for(i = 0; i < 5; i++)
+	{
+		int index = randomShareable()*3 + 2;
+		index = index + 2;
+		arr[index] = 1;
+		
+
+	}
+
 	shmdt(arr);
 	
 		
@@ -36,7 +61,8 @@ int main()
 void StartProgram()
 {
 
-	int maxAllowed = 6;
+	int maxAllowed = 20;
+	int maxAtOneTime = 18;
 	int childCreated = 0;
 	int aliveChilds = 0;
 	char ** argToPass = (char**)malloc(sizeof(char *) * 2);
@@ -52,7 +78,7 @@ void StartProgram()
 	do
 	{
 		
-		if(maxAllowed > aliveChilds && childCreated < maxAllowed && CheckTime() == 1)
+		if(maxAtOneTime > aliveChilds && childCreated < maxAllowed && CheckTime() == 1)
 		{
 			pid = fork();
 			if(pid < 0)	
@@ -123,6 +149,7 @@ void StartProgram()
 
 
 void SetTime()
+
 {
 	sharedID = GetSharedIDFromFile();
 	int * arr = (int*)shmat(sharedID, NULL, 0);
@@ -221,6 +248,24 @@ int CheckTime()
 	shmdt(arr);
 	return flag;
 	
+}
+int RandomeShareable()
+{
+	struct timeval t1;
+	gettimeofday(&t1, NULL);
+	srand(t1.tv_usec * t1.tv_sec);
+	return ((rand() % 21));
+
+}
+
+int RandomResourceNumber()
+{
+
+	struct timeval t1;
+	gettimeofday(&t1, NULL);
+	srand(t1.tv_usec * t1.tv_sec);
+	
+	return ((rand() % 10) + 1);
 }
 
 void RandomTime()

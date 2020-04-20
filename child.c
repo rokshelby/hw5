@@ -27,7 +27,7 @@ int main(int argc, char ** argv)
 	sbuf.sem_op = 1;
 	sbuf.sem_flg = 0;
 	semop(semID, &sbuf, 1);
-
+	sleep(3);
 	return 0;
 }
 int GetSharedIDFromFile()
